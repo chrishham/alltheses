@@ -95,21 +95,25 @@ function createSimpleVueFile (advisors) {
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 </head>
 <body>
-  <div id='app'>
-    <div class="container-fluid">
-      <h1>ΣΔΥ: Όλες οι διπλωματικές</h1>
-      <div v-for='advisor in advisors'>
-        <hr>
-        <h2>{{advisor.name}}</h2>
-        <span>Number Of Theses: {{advisor.numOfTheses}}</span>
-        <ol>
-          <li v-for="thesis in advisor.theses">
-            <a :href="thesis.url">{{thesis.title}}</a>- {{thesis.authors}}
-          </li>
-        </ol>
+<div id='app'>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="offset-md-2 col-md-8">
+        <h1>ΣΔΥ: Όλες οι διπλωματικές</h1>
+        <div v-for='advisor in advisors'>
+          <hr>
+          <h2>{{advisor.name}}</h2>
+          <span>Number Of Theses: {{advisor.numOfTheses}}</span>
+          <ol>
+            <li v-for="thesis in advisor.theses">
+              <a :href="thesis.url">{{thesis.title}}</a>- {{thesis.authors}}
+            </li>
+          </ol>
+        </div>
       </div>
     </div>
   </div>
+</div>
   <script>
     var app = new Vue({
       el: '#app',

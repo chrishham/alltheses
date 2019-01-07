@@ -47,7 +47,7 @@ function mainProgram () {
     .then(thesisInfoArray => {
       let advisors = normalizeData(thesisInfoArray)
       fs.writeJSON('advisors.json', advisors)
-      fs.writeFileSync('test.html', createSimpleVueFile(JSON.stringify(advisors)))
+      fs.writeFileSync('index.html', createSimpleVueFile(JSON.stringify(advisors)))
     })
     .then(() => console.log('All done!'))
     .catch(error => console.log(error))
@@ -92,24 +92,22 @@ function createSimpleVueFile (advisors) {
 <head>
   <title>All SDY thesis</title>
   <script src='https://unpkg.com/vue'></script>
-  <style>
-    img {
-      width: 400px;
-    }
-  </style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 </head>
 <body>
   <div id='app'>
-    <h1>ΣΔΥ: Όλες οι διπλωματικές</h1>
-    <div v-for='advisor in advisors'>
-      <hr>
-      <h2>{{advisor.name}}</h2>
-      <span>Number Of Theses: {{advisor.numOfTheses}}</span>
-      <ol>
-        <li v-for="thesis in advisor.theses">
-          <a :href="thesis.url">{{thesis.title}}</a>
-        </li>
-      </ol>
+    <div class="container-fluid">
+      <h1>ΣΔΥ: Όλες οι διπλωματικές</h1>
+      <div v-for='advisor in advisors'>
+        <hr>
+        <h2>{{advisor.name}}</h2>
+        <span>Number Of Theses: {{advisor.numOfTheses}}</span>
+        <ol>
+          <li v-for="thesis in advisor.theses">
+            <a :href="thesis.url">{{thesis.title}}</a>- {{thesis.authors}}
+          </li>
+        </ol>
+      </div>
     </div>
   </div>
   <script>
@@ -223,8 +221,8 @@ function normalizeData (data) {
   // 'ΓΑΒΑΛΑΣ ΔΑΜΙΑΝΟΣ': 4,
   // 'Γαβαλάς, Δαμιανός': 3,
 
-  var result = _.countBy(data, 'advisor');
-  // console.log(result)
+  // var result = _.countBy(data, 'advisor');
+  // // console.log(result)
   let grouped = _(data).groupBy(b => b.advisor)
     .map((value, key) => ({ name: key, theses: value, numOfTheses: value.length }))
     .value()

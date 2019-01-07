@@ -1,3 +1,4 @@
+require('dotenv').config()
 const fs = require('fs-extra')
 const async = require('async')
 const request = require('request-promise')
@@ -33,11 +34,11 @@ function mainProgram () {
 
   let thesisArray = []
 
-  for (let i = 0;i < 3;i++) {
+  for (let i = 0; i < 3; i++) {
     thesisArray.push(`https://apothesis.eap.gr/handle/repo/12645?offset=${i * 50}`)
   }
 
-  Promise.all(thesisArray.map(url => request({ url, 'proxy': 'http://wsa.central.nbg.gr:8080' })))
+  Promise.all(thesisArray.map(url => request({ url, 'proxy': process.env.PROXY })))
     .then(res => {
       let totalBodies = res[0] + res[1] + res[2]
       let thesisUrls = scrapeIt.scrapeHTML(totalBodies, thesisUrl).urls
@@ -46,7 +47,7 @@ function mainProgram () {
     })
     .then(thesisInfoArray => {
       let advisors = normalizeData(thesisInfoArray)
-      fs.writeJSON('advisors.json', advisors)
+      // fs.writeJSON('advisors.json', advisors)
       fs.writeFileSync('index.html', createSimpleVueFile(JSON.stringify(advisors)))
     })
     .then(() => console.log('All done!'))
@@ -59,7 +60,7 @@ function scrapeWithConcurrency (urlsToScrape) {
   let totalUrls = urlsToScrape.length
   return new Promise((resolve, reject) => {
     let q = async.queue(function (url, callback) {
-      request({ url, 'proxy': 'http://wsa.central.nbg.gr:8080' })
+      request({ url, 'proxy': process.env.PROXY })
         .then(srapedPage => {
           urlsScraped++
           fs.writeFileSync('thesis.html', srapedPage)
@@ -131,10 +132,6 @@ function createSimpleVueFile (advisors) {
 }
 
 function normalizeData (data) {
-  // const data = require('./thesisInfoArray.json')
-  // https://apothesis.eap.gr/handle/repo/26577
-  // https://apothesis.eap.gr/handle/repo/26579
-  // are zip
   data.forEach(el => {
     if (el.url === "https://apothesis.eap.gr/handle/repo/26319") el.advisor = 'noAdvisor'
     if (el.url === 'https://apothesis.eap.gr/handle/repo/36865') {
@@ -159,6 +156,12 @@ function normalizeData (data) {
     }
     if (el.url === 'https://apothesis.eap.gr/handle/repo/26317') {
       el.advisor = 'Χωριανόπουλος, Κωνσταντίνος'
+    }
+    if (el.url === 'https://apothesis.eap.gr/handle/repo/26577') {
+      el.advisor = 'Χατζημίσιος, Περικλής'
+    }
+    if (el.url === 'https://apothesis.eap.gr/handle/repo/26579') {
+      el.advisor = 'Γεωργιάδης, Χρήστος'
     }
 
     if (el.advisor === 'Kameas, Achilles' ||
